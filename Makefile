@@ -35,7 +35,7 @@ clean:
 # x86 BIN
 #
 $(BINX86):
-	python3 misc/pedump.py $(OUTX86) $@
+	python misc/pedump.py $(OUTX86) $@
 
 #
 # x86 OBJ
@@ -53,7 +53,7 @@ $(OUTX86):
 # x64 BIN
 #
 $(BINX64):
-	python3 misc/pedump.py $(OUTX64) $@
+	python misc/pedump.py $(OUTX64) $@
 
 #
 # x64 OBJ
