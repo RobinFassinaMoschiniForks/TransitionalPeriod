@@ -5,8 +5,21 @@
 //! Precalculated DJB2 Hashes.
 #define H_KERNEL32                   0x6ddb9555
 #define H_NTOSKRNL                   0xa3ad0390
+#define H_WS2_32                     0x89f03a6f
 #define H_NTDLL                      0x1edab0ed
 
+//! Usermode Hashes
+#define H_WSASOCKET                  0x74a02599
+#define H_WSACONNECT                 0x39c9bd7a
+#define H_WSACLEANUP                 0x32206eb8
+#define H_WSASTARTUP                 0x142e89c3
+#define H_CLOSEHANDLE                0xfdb928e7
+#define H_FREELIBRARY                0x4ad9b11c
+#define H_CLOSESOCKET                0x185953a4
+#define H_LOADLIBRARYA               0xb7072fdb
+#define H_CREATEPROCESSA             0xfbaf90b9
+
+//! Kernelmode Hashes
 #define H_EXFREEPOOL                 0x3f7747de
 #define H_EXALLOCATEPOOL             0xa1fe8ce1
 #define H_EXQUEUEWORKITEM            0xd6b8d919

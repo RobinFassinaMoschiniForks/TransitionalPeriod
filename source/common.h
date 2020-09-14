@@ -8,6 +8,7 @@
 //! External Includes
 #include <intrin.h>
 #include <limits.h>
+#include <winsock2.h>
 #include <windows.h>
 #include <ntstatus.h>
 
@@ -59,7 +60,15 @@ typedef struct
 //! UM Function Table
 typedef struct
 {
-
+	FUNC(WSASocket);
+	FUNC(WSAConnect);
+	FUNC(WSAStartup);
+	FUNC(WSACleanup);
+	FUNC(closesocket);
+	FUNC(CloseHandle);
+	FUNC(FreeLibrary);
+	FUNC(LoadLibraryA);
+	FUNC(CreateProcessA);
 } UM_API;
 
 //! Internal Includes
