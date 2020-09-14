@@ -9,7 +9,7 @@
 #define H_NTDLL                      0x1edab0ed
 
 //! Usermode Hashes
-#define H_WSASOCKET                  0x74a02599
+#define H_WSASOCKETA                 0x08a4d8fa
 #define H_WSACONNECT                 0x39c9bd7a
 #define H_WSACLEANUP                 0x32206eb8
 #define H_WSASTARTUP                 0x142e89c3
@@ -18,6 +18,7 @@
 #define H_CLOSESOCKET                0x185953a4
 #define H_LOADLIBRARYA               0xb7072fdb
 #define H_CREATEPROCESSA             0xfbaf90b9
+#define H_WAITFORSINGLEOBJECT        0x0df1b3da
 
 //! Kernelmode Hashes
 #define H_EXFREEPOOL                 0x3f7747de

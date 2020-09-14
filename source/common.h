@@ -18,15 +18,12 @@
 #include "ntpcr.h"
 #include "nt.h"
 
-//! Remove NOP's
-#define NOPPAD			__attribute__((aligned(1)))
-
 //! Custom Sections
-#define KENTRY			NOPPAD __attribute__((section(".text$B")))
-#define KMFUNC			NOPPAD __attribute__((section(".text$C")))
-#define UENTRY			NOPPAD __attribute__((section(".text$E")))
-#define UMFUNC			NOPPAD __attribute__((section(".text$F")))
-#define SHARED			NOPPAD __attribute__((section(".text$F")))
+#define KENTRY			__attribute__((section(".text$B")))
+#define KMFUNC			__attribute__((section(".text$C")))
+#define UENTRY			__attribute__((section(".text$E")))
+#define UMFUNC			__attribute__((section(".text$F")))
+#define SHARED			__attribute__((section(".text$F")))
 
 //! Macros
 #define ZwCurrentProcess()	((HANDLE)-1)
@@ -60,7 +57,7 @@ typedef struct
 //! UM Function Table
 typedef struct
 {
-	FUNC(WSASocket);
+	FUNC(WSASocketA);
 	FUNC(WSAConnect);
 	FUNC(WSAStartup);
 	FUNC(WSACleanup);
@@ -69,6 +66,7 @@ typedef struct
 	FUNC(FreeLibrary);
 	FUNC(LoadLibraryA);
 	FUNC(CreateProcessA);
+	FUNC(WaitForSingleObject);
 } UM_API;
 
 //! Internal Includes
